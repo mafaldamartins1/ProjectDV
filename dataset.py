@@ -45,6 +45,8 @@ df['Number of Other Race Victims'] = df['Number of Other Race Male Victims'] + d
 
 # drop das outras?
 
-#print(df.columns)
+print(df['Sex'].unique())
+print(df['Victim(s) Race(s)'].unique())
+
 #print(df['Foreign National'].unique())
 #print(df['Execution Volunteer'].unique())

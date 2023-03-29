@@ -26,7 +26,7 @@ range_slider = dcc.RangeSlider(
 # Dropdown for sex
 sex_dropdown = dcc.Dropdown(
     id = 'sex_dropdown',
-    value = df['Sex'].unique(),
+    options = df['Sex'].unique(),
     multi = True,
     clearable = True,
     searchable=False,
@@ -36,7 +36,7 @@ sex_dropdown = dcc.Dropdown(
 # Dropdown for race
 race_dropdown = dcc.Dropdown(
     id = 'race_dropdown',
-    value = df['Race'].unique(),
+    options = df['Race'].unique(),
     multi = True,
     clearable = True,
     searchable= False,
