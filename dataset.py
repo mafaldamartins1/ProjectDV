@@ -4,7 +4,8 @@ import pandas as pd
 ### DATA IMPORTING AND TREATMENT
 
 # Specify the path to CSV file
-file_path = 'C:/Users/Mafalda/Documents/GitHub/ProjectDV/dataset_US_executions.csv'
+# file_path = 'C:/Users/Mafalda/Documents/GitHub/ProjectDV/dataset_US_executions.csv'
+file_path = 'https://raw.githubusercontent.com/mafaldamartins1/ProjectDV/main/dataset_US_executions.csv'
 
 # Read the CSV file into a pandas dataframe
 df = pd.read_csv(file_path)
