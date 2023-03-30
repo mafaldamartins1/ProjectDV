@@ -67,7 +67,7 @@ server = app.server
 
 app.layout = html.Div([
     html.Div(
-        [
+        [ ## logo + titulo
             html.Img(
                 src='/assets/logo.png',
                 style={
@@ -90,8 +90,7 @@ app.layout = html.Div([
         ],
         id='Title row',
         className='title_box',
-        style={'display': 'flex'}
-    ),
+        style={'display': 'flex'}),
     html.Br(),
     html.Br(),
     html.Div([
@@ -112,7 +111,7 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.Label(id='map_title'),
-            ], style={'text-align': 'center', 'padding-bottom': '10px', 'font-weight':'bold'}),
+            ], style={'text-align': 'center', 'padding-bottom': '10px', 'font-weight':'bold', 'font-size': '20px'}),
             html.Div([
                 race_dropdown
             ], style={'text-align': 'center', 'padding-bottom': '10px', 'width': '200px'}),
@@ -121,7 +120,7 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.Label(id='pie_title'),
-            ], style={'text-align': 'center', 'padding-bottom': '7px', 'font-weight':'bold'}),
+            ], style={'text-align': 'center', 'padding-bottom': '7px', 'font-weight':'bold', 'font-size': '20px'}),
             html.Div([
                 dcc.Graph(id='nested_pie_chart')
             ])
