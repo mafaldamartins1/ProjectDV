@@ -66,50 +66,79 @@ server = app.server
 #################### APP LAYOUT ####################
 
 app.layout = html.Div([
-    html.Div([
-        html.H1('Execution in US')
-    ], id='Title row', className='title_box'),
+    html.Div(
+        [
+            html.Img(
+                src='/assets/logo.png',
+                style={
+                    'height': '50px',
+                    'display': 'inline-block',
+                    'margin-right': '15px',
+                    'vertical-align': 'top'
+                }
+            ),
+            html.H1(
+                'Executions in US',
+                style={
+                    'display': 'inline-block',
+                    'vertical-align': 'top',
+                    'margin': '0',
+                    'text-align': 'center',
+                    'width': '100%'
+                }
+            )
+        ],
+        id='Title row',
+        className='title_box',
+        style={'display': 'flex'}
+    ),
     html.Br(),
     html.Br(),
     html.Div([
         sex_dropdown,
-    ],),
+    ], style={'width': '200px'}),
     html.Div([
         html.Div([
-            volunteer_checkbox
-        ]),
-        html.Br(),
-        html.Div([
+            volunteer_checkbox,
             foreign_checkbox
-        ])
+        ]),
     ]),
-
     html.Div([
         range_slider
     ]),
     html.Br(),
     html.Br(),
-
     html.Div([
         html.Div([
             html.Div([
-                html.Label(id = 'map_title'),
-            ]),
+                html.Label(id='map_title'),
+            ], style={'text-align': 'center', 'padding-bottom': '7px', 'font-weight':'bold'}),
             html.Div([
-                race_dropdown,
-            ]),
+                race_dropdown
+            ], style={'text-align': 'center', 'padding-bottom': '7px'}),
             dcc.Graph(id='usa_map'),
-        ])
+        ], style={'display': 'inline-block', 'width': '70%'}),
+        html.Div([
+            html.Div([
+                html.Label(id='pie_title'),
+            ], style={'text-align': 'center', 'padding-bottom': '7px', 'font-weight':'bold'}),
+            html.Div([
+                dcc.Graph(id='nested_pie_chart')
+            ])
+        ], style={'display': 'inline-block', 'width': '30%'}),
     ])
-
 ])
+
+
 
 ################################### CALLBACKS ###################################
 
 @app.callback(
     [
         Output('map_title', 'children'),
-        Output('usa_map', 'figure')
+        Output('usa_map', 'figure'),
+        Output('pie_title', 'children'),
+        Output('nested_pie_chart', 'figure'),
     ],
     [
         Input('range_slider', 'value'),
@@ -119,15 +148,12 @@ app.layout = html.Div([
         Input('foreign_checkbox', 'value')
     ]
 )
-### VISUALIZATION 1- USA MAP
+
 def plot_map(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_checkbox):
     filtered_df = df[(df['Execution Year'] >= range_slider[0]) & (df['Execution Year'] <= range_slider[1])]
 
     if sex_dropdown:
         filtered_df = filtered_df[filtered_df['Sex'].isin(sex_dropdown)]
-
-    if race_dropdown:
-        filtered_df = filtered_df[filtered_df['Race'].isin(race_dropdown)]
 
     if 'yes' in volunteer_checkbox:
         filtered_df = filtered_df[filtered_df['Execution Volunteer'] == 'yes']
@@ -135,21 +161,39 @@ def plot_map(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, fore
     if 'Yes' in foreign_checkbox:
         filtered_df = filtered_df[filtered_df['Foreign National'] == 'Yes']
 
-    executions_by_state = filtered_df.groupby('State')['State'].count().reset_index(name='Executions')
+    ### VISUALIZATION 1- USA MAP
+    if race_dropdown:
+        filtered_df_map = filtered_df[filtered_df['Race'].isin(race_dropdown)]
+        executions_by_state = filtered_df_map.groupby('State Code')['State Code'].count().reset_index(name='Executions')
+        executions_by_state['State'] = filtered_df_map['State']
+    else:
+        executions_by_state = filtered_df.groupby('State Code')['State Code'].count().reset_index(name='Executions')
+        executions_by_state['State'] = filtered_df['State']
 
     map_title = f'Total number of executions by state'
 
-    fig = px.choropleth(data_frame=executions_by_state,
-                        locations='State',
+    fig1 = px.choropleth(data_frame=executions_by_state,
+                        locations='State Code',
                         locationmode="USA-states",
                         scope="usa",
                         height=600,
                         color='Executions',
                         color_continuous_scale='reds',
                         range_color=(0, executions_by_state['Executions'].max()),
-                        labels={'Executions': 'Number of Executions'})
+                        labels={'Executions': 'Number of Executions'},
+                        hover_data={'State':True, 'Executions':True})
 
-    return fig, map_title
+    ### VISUALIZATION 2- NESTED PIE CHART
+    pie_title = f'Number of executions by sex and race'
+
+    filtered_df_grouped = filtered_df.groupby(['Sex', 'Race']).size().reset_index(name='Count')
+
+    fig2 = px.sunburst(data_frame=filtered_df_grouped,
+                       path=['Sex', 'Race'],
+                       values='Count',
+                       color='Race')
+
+    return map_title, fig1, pie_title, fig2
 
 
 ################################### END OF THE APP ###################################
