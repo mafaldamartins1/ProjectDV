@@ -66,8 +66,7 @@ server = app.server
 #################### APP LAYOUT ####################
 
 app.layout = html.Div([
-    html.Div(
-        [ ## logo + titulo
+    html.Div([
             html.Img(
                 src='/assets/logo.png',
                 style={
@@ -94,29 +93,32 @@ app.layout = html.Div([
     html.Br(),
     html.Br(),
     html.Div([
-        sex_dropdown,
-    ], style={'width': '200px'}),
-    html.Div([
-        html.Div([
-            volunteer_checkbox,
-            foreign_checkbox
-        ]),
-    ]),
-    html.Div([
-        range_slider
-    ]),
-    html.Br(),
-    html.Br(),
-    html.Div([
         html.Div([
             html.Div([
-                html.Label(id='map_title'),
-            ], style={'text-align': 'center', 'padding-bottom': '10px', 'font-weight':'bold', 'font-size': '20px'}),
+                sex_dropdown,
+            ], style={'text-align': 'center','width': '300px'}),
+            html.Div([
+                volunteer_checkbox,
+                foreign_checkbox,
+            ], style={'margin-top': '20px'}),
+        ], style={'display': 'flex', 'align-items': 'center'}),
+        html.Br(),
+        html.Div([
+            range_slider,
+        ], style={'width': '700px'}),
+    ], style={'margin': 'auto', 'max-width': '800px', 'display': 'flex', 'flex-direction': 'column',
+              'align-items': 'center'}),
+    html.Br(),
+    html.Br(),
+    html.Div([
+        html.Div([
+            html.Label(id='map_title'),
+        ], style={'text-align': 'center', 'padding-bottom': '10px', 'font-weight': 'bold', 'font-size': '20px', 'width': '350px', 'margin-left': '300px'}),
             html.Div([
                 race_dropdown
-            ], style={'text-align': 'center', 'padding-bottom': '10px', 'width': '200px'}),
+            ], style={'text-align': 'center', 'width': '350px', 'margin-left': '300px'}),
             dcc.Graph(id='usa_map'),
-        ], style={'display': 'inline-block', 'width': '70%'}),
+        ], style={'display': 'inline-block', 'width': '70%', 'text-align': 'center'}),
         html.Div([
             html.Div([
                 html.Label(id='pie_title'),
@@ -126,7 +128,9 @@ app.layout = html.Div([
             ])
         ], style={'display': 'inline-block', 'width': '30%'}),
     ])
-])
+
+sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
+
 
 
 
