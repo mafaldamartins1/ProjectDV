@@ -112,10 +112,10 @@ app.layout = html.Div([
         html.Div([
             html.Div([
                 html.Label(id='map_title'),
-            ], style={'text-align': 'center', 'padding-bottom': '7px', 'font-weight':'bold'}),
+            ], style={'text-align': 'center', 'padding-bottom': '10px', 'font-weight':'bold'}),
             html.Div([
                 race_dropdown
-            ], style={'text-align': 'center', 'padding-bottom': '7px'}),
+            ], style={'text-align': 'center', 'padding-bottom': '10px', 'width': '200px'}),
             dcc.Graph(id='usa_map'),
         ], style={'display': 'inline-block', 'width': '70%'}),
         html.Div([
