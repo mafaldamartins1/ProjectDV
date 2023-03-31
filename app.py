@@ -57,6 +57,9 @@ foreign_checkbox  = dcc.Checklist(
     value=[]
 )
 
+counts = df.groupby(['Execution Date', 'Race']).size().reset_index(name='Count')
+
+
 ################################### APP ###################################
 
 app = dash.Dash(__name__)
@@ -127,7 +130,17 @@ app.layout = html.Div([
                 dcc.Graph(id='nested_pie_chart')
             ])
         ], style={'display': 'inline-block', 'width': '30%'}),
+    html.Br(),
+    html.Br(),
+    html.Div([
+        html.Div([
+            html.Label(id='linechart_title')
+        ],style={'text-align': 'center', 'padding-bottom': '7px', 'font-weight':'bold', 'font-size': '20px'}),
+        html.Div([
+            dcc.Graph(id='linechart')
+        ], style={'display': 'inline-block', 'width': '70%'})
     ])
+])
 
 sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
 
@@ -142,6 +155,8 @@ sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
         Output('usa_map', 'figure'),
         Output('pie_title', 'children'),
         Output('nested_pie_chart', 'figure'),
+        Output('linechart_title','children'),
+        Output('linechart', 'figure')
     ],
     [
         Input('range_slider', 'value'),
@@ -196,7 +211,11 @@ def plot_map(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, fore
                        values='Count',
                        color='Race')
 
-    return map_title, fig1, pie_title, fig2
+    ### VISUALIZATION 3 - LINE CHART
+    linechart_title = f'Executions per Race over time'
+    executions_by_race = filtered_df.groupby(['Race', 'Execution Year']).size().reset_index(name='Executions')
+    linechart= px.line(executions_by_race, x="Execution Year", y='Executions', color='Race', height=400)
+    return map_title, fig1, pie_title, fig2, linechart_title ,linechart
 
 
 ################################### END OF THE APP ###################################

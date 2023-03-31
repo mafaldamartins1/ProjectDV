@@ -21,7 +21,6 @@ df['Execution Year'], df['Execution Month'] = df['Execution Date'].dt.year, df['
 
 # Join both 'White' values of column 'Race' together
 df.loc[df['Race'].str.startswith('White'), 'Race'] = 'White'
-
 # Join both 'South' values of column 'Region' together
 df.loc[df['Region'].str.startswith('South'), 'Region'] = 'South'
 
@@ -101,3 +100,4 @@ state_codes = {
 df['State Code'] = df['State'].map(state_codes)
 
 # print(df.columns)
+
