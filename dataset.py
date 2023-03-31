@@ -95,9 +95,10 @@ state_codes = {
     'Wisconsin': 'WI',
     'Wyoming': 'WY'
 }
+df['Race'] = df['Race'].replace('American Indian or Alaska Native','Native American')
 
 # Create a new column in your dataframe that maps state names to state codes
 df['State Code'] = df['State'].map(state_codes)
 
-# print(df.columns)
+print(df.columns)
 

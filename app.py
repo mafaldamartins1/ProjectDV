@@ -134,21 +134,24 @@ app.layout = html.Div([
     html.Br(),
     html.Div([
         html.Div([
-            html.Label(id='linechart_title')
-        ],style={'text-align': 'center', 'padding-bottom': '7px', 'font-weight':'bold', 'font-size': '20px'}),
+            html.Label(id='matrix_title'),
+        ], style={'text-align': 'center', 'padding-bottom': '10px', 'font-weight': 'bold', 'font-size': '20px',
+                  'width': '350px', 'margin-left': '300px'}),
         html.Div([
-            dcc.Graph(id='linechart')
-        ], style={'display': 'inline-block', 'width': '70%'})
-    ]),
-    html.Div([
-        dcc.Graph(id='df_corr_etn')
-    ], style={'display': 'inline-block', 'width': '70%'})
+            dcc.Graph(id='matrix'),
+        ], style={'display': 'inline-block', 'width': '50%', 'text-align': 'center'}),
+        html.Div([
+            html.Div([
+                html.Label(id='linechart_title'),
+            ], style={'text-align': 'center', 'padding-bottom': '7px', 'font-weight': 'bold', 'font-size': '20px'}),
+            html.Div([
+                dcc.Graph(id='linechart')
+            ])
+        ], style={'display': 'inline-block', 'width': '50%', 'margin-top': '50px'}),
+    ])
 ])
 
 sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
-
-
-
 
 ################################### CALLBACKS ###################################
 
@@ -160,7 +163,8 @@ sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
         Output('nested_pie_chart', 'figure'),
         Output('linechart_title','children'),
         Output('linechart', 'figure'),
-        Output('df_corr_etn', 'figure')
+        Output('matrix_title', 'children'),
+        Output('matrix', 'figure')
     ],
     [
         Input('range_slider', 'value'),
@@ -208,28 +212,50 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
     ### VISUALIZATION 2- NESTED PIE CHART
     pie_title = f'Number of executions by sex and race'
 
-    filtered_df_grouped = filtered_df.groupby(['Sex', 'Race']).size().reset_index(name='Count')
+    filtered_df_grouped = filtered_df.groupby(['Sex', 'Race']).size().reset_index(name='Executions')
 
     fig2 = px.sunburst(data_frame=filtered_df_grouped,
                        path=['Sex', 'Race'],
-                       values='Count',
+                       values='Executions',
                        color='Race')
 
     ### VISUALIZATION 3 - LINE CHART
     linechart_title = f'Executions per Race over time'
-    executions_by_race = filtered_df.groupby(['Race', 'Execution Year']).size().reset_index(name='Executions')
-    linechart= px.line(executions_by_race, x="Execution Year", y='Executions', color='Race', height=400)
 
-    ### VISUALIZATION 4 -
+    executions_by_race_by_year = filtered_df.groupby(['Race', 'Execution Year']).size().reset_index(name='Executions')
 
-    df_corr_etn = filtered_df['Race', 'Number of White Victims', 'Number of Black Victims', 'Number of Latino Victims', 'Number of Asian Victims', 'Number of Native American Victims', 'Number of Other Race Victims']
-    df_corr_etn.corrwith(df_corr_etn['Race'])
-    df_corr_etn.iplot(kind="heatmap",
-                      colorscale="Blues",
-                      title="Matriz de etnia mata que etnia",
-                      dimensions=(500, 500))
+    linechart = px.line(executions_by_race_by_year, x="Execution Year", y='Executions', color='Race', height=400)
 
-    return map_title, fig1, pie_title, fig2, linechart_title, linechart, df_corr_etn
+    ### VISUALIZATION 4 - MATRIX
+
+    matrix_title = f'Matriz de etnia mata que etnia'
+
+    victims_by_race = filtered_df.groupby('Race').size().reset_index(name='Executions')
+    victims_by_race = victims_by_race[victims_by_race['Executions'] > 0]    # filter out races with 0 executions
+
+    victims_columns = ['Number of White Victims', 'Number of Black Victims', 'Number of Latino Victims',
+                       'Number of Asian Victims', 'Number of Native American Victims', 'Number of Other Race Victims']
+
+    race_victims = ['White', 'Black', 'Latinx', 'Asian', 'Native American', 'Other Race']
+
+    victims_data = filtered_df.groupby('Race')[victims_columns].sum().reset_index(drop=True)
+
+    max_victims = victims_data.sum().max()
+
+    fig4 = px.imshow(victims_data,
+                     labels=dict(x="Victim's Race", y="Race of the Executed"),
+                     x=race_victims,
+                     y=victims_by_race['Race'],
+                     color_continuous_scale='blues')
+
+    #df_corr_etn = filtered_df['Race', 'Number of White Victims', 'Number of Black Victims', 'Number of Latino Victims', 'Number of Asian Victims', 'Number of Native American Victims', 'Number of Other Race Victims']
+    #df_corr_etn.corrwith(df_corr_etn['Race'])
+    #df_corr_etn.iplot(kind="heatmap",
+     #                 colorscale="Blues",
+     #                 title="Matriz de etnia mata que etnia",
+     #                 dimensions=(500, 500))
+
+    return map_title, fig1, pie_title, fig2, linechart_title, linechart, matrix_title, fig4
 
 ################################### END OF THE APP ###################################
 
