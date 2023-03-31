@@ -139,7 +139,10 @@ app.layout = html.Div([
         html.Div([
             dcc.Graph(id='linechart')
         ], style={'display': 'inline-block', 'width': '70%'})
-    ])
+    ]),
+    html.Div([
+        dcc.Graph(id='df_corr_etn')
+    ], style={'display': 'inline-block', 'width': '70%'})
 ])
 
 sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
@@ -156,7 +159,8 @@ sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
         Output('pie_title', 'children'),
         Output('nested_pie_chart', 'figure'),
         Output('linechart_title','children'),
-        Output('linechart', 'figure')
+        Output('linechart', 'figure'),
+        Output('df_corr_etn', 'figure')
     ],
     [
         Input('range_slider', 'value'),
@@ -167,7 +171,7 @@ sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
     ]
 )
 
-def plot_map(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_checkbox):
+def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_checkbox):
     filtered_df = df[(df['Execution Year'] >= range_slider[0]) & (df['Execution Year'] <= range_slider[1])]
 
     if sex_dropdown:
@@ -215,8 +219,17 @@ def plot_map(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, fore
     linechart_title = f'Executions per Race over time'
     executions_by_race = filtered_df.groupby(['Race', 'Execution Year']).size().reset_index(name='Executions')
     linechart= px.line(executions_by_race, x="Execution Year", y='Executions', color='Race', height=400)
-    return map_title, fig1, pie_title, fig2, linechart_title ,linechart
 
+    ### VISUALIZATION 4 -
+
+    df_corr_etn = filtered_df['Race', 'Number of White Victims', 'Number of Black Victims', 'Number of Latino Victims', 'Number of Asian Victims', 'Number of Native American Victims', 'Number of Other Race Victims']
+    df_corr_etn.corrwith(df_corr_etn['Race'])
+    df_corr_etn.iplot(kind="heatmap",
+                      colorscale="Blues",
+                      title="Matriz de etnia mata que etnia",
+                      dimensions=(500, 500))
+
+    return map_title, fig1, pie_title, fig2, linechart_title, linechart, df_corr_etn
 
 ################################### END OF THE APP ###################################
 
