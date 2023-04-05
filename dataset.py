@@ -17,7 +17,7 @@ df['Foreign National'] = df['Foreign National'].replace('no','No')
 
 # Change the type of the 'Execution Date' column to Date
 df['Execution Date'] = pd.to_datetime(df['Execution Date'])
-df['Execution Year'], df['Execution Month'] = df['Execution Date'].dt.year, df['Execution Date'].dt.month
+df['Execution Year'] = df['Execution Date'].dt.year
 
 # Join both 'White' values of column 'Race' together
 df.loc[df['Race'].str.startswith('White'), 'Race'] = 'White'
@@ -102,3 +102,4 @@ df['State Code'] = df['State'].map(state_codes)
 
 print(df.columns)
 
+print(df['Victim(s) Race(s)'].unique())
