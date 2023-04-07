@@ -103,3 +103,13 @@ df['State Code'] = df['State'].map(state_codes)
 print(df.columns)
 
 print(df['Victim(s) Race(s)'].unique())
+
+# Drop columns that won't be used
+# 'Last Name', 'Middle Name(s)', 'Suffix', 'Number of White Male Victims', 'Number of Black Male Victims',
+#        'Number of Latino Male Victims', 'Number of Asian Male Victims',
+#        'Number of Native American Male Victims',
+#        'Number of Other Race Male Victims', 'Number of White Female Victims',
+#        'Number of Black Female Victims', 'Number of Latino Female Victims',
+#        'Number of Asian Female Victims',
+#        'Number of American Indian or Alaska Native Female Victims',
+#        'Number of Other Race Female Victims', 'Victim(s) Race(s)'
