@@ -103,8 +103,8 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
         style={'display': 'flex'}),
     html.Br(),
     html.Div([
-        html.H6(['The United Sates is still one of the places where the death penalty is applied,',html.Br(),'and with this project we wanted to explore a little more about this subject.',html.Br(),'Lets explore!'])],
-    style={'width': '100%', 'text-align': 'center', 'color':'white'}),
+        html.H6('TEXTO INTRODUTORIO BLABLABLA INTRODUÇAO DO REPORT AHAHAHHAH')],
+    style={'width': '100%', 'text-align': 'center'}),
     html.Br(),
     html.Div([
         html.Div([
@@ -134,7 +134,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
                 race_dropdown
             ], style={'text-align': 'center', 'width': '350px', 'margin-left': '500px', 'color': '#1E1E1E', 'background-color': '#1E1E1E'}),
         html.Div([
-            dcc.Graph(id='usa_map'),
+            dcc.Graph(id='choropleth_map'),
         ], style={'width': '100%'}),
     ], style={'display': 'inline-block', 'width': '100%', 'text-align': 'center'}),
     html.Div([
@@ -143,23 +143,21 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
             dcc.Graph(id='nested_pie_chart')    ], style={'width': '30%'}),
         html.Div([        html.H2('55.6% of the executed were white and 98.5% of them were male')    ], style={'width': '30%', 'text-align': 'center'}),
     ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center', 'width': '100%'}),
-    html.Br(),
-    html.Br(),
     html.Div([
         html.Div([
             dcc.Graph(id='linechart')
         ], style={'display': 'inline-block', 'width': '48%'}),
         html.Div([
-             dcc.Graph(id='scatter_fig')
-         ], style={'display': 'inline-block', 'width': '48%'}),
+            dcc.Graph(id='stackedBar')
+        ], style={'display': 'inline-block', 'width': '48%'}),
     ], style={'display': 'inline-block', 'width': '100%', 'text-align': 'center'}),
-html.Div([
+    html.Div([
         html.Div([
             dcc.Graph(id='matrix'),
         ], style={'display': 'inline-block', 'width': '48%', 'text-align': 'center'}),
-        html.Div([
-                dcc.Graph(id='figH')
-        ], style={'display': 'inline-block', 'width': '48%', 'margin-top': '50px'}),
+         html.Div([
+            dcc.Graph(id='scatter_fig')
+        ], style={'display': 'inline-block', 'width': '48%'}),
     ], style={'display': 'inline-block', 'width': '100%', 'text-align': 'center'}),
 ])
 
@@ -170,12 +168,12 @@ sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
 @app.callback(
     [
         Output('map_title', 'children'),
-        Output('usa_map', 'figure'),
+        Output('choropleth_map', 'figure'),
         Output('nested_pie_chart', 'figure'),
         Output('linechart', 'figure'),
         Output('matrix', 'figure'),
         Output('scatter_fig', 'figure'),
-        Output('figH', 'figure')
+        Output('stackedBar', 'figure')
     ],
     [
         Input('range_slider', 'value'),
@@ -190,7 +188,7 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
     filtered_df = df[(df['Execution Year'] >= range_slider[0]) & (df['Execution Year'] <= range_slider[1])]
 
     if sex_dropdown:
-        filtered_df = filtered_df[filtered_df['Sex'].isin(sex_dropdown)]
+        filtered_df = filtered_df[filtered_df['Sex']==sex_dropdown]
 
     if 'yes' in volunteer_checkbox:
         filtered_df = filtered_df[filtered_df['Execution Volunteer'] == 'yes']
@@ -209,7 +207,7 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     map_title = f'Total number of executions by state'
 
-    fig1 = px.choropleth(data_frame=executions_by_state,
+    choropleth_map = px.choropleth(data_frame=executions_by_state,
                         locations='State Code',
                         locationmode="USA-states",
                         scope="usa",
@@ -221,7 +219,7 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
                         hover_data={'State':True, 'Executions':True}
                          )
 
-    fig1.update_layout(
+    choropleth_map.update_layout(
         coloraxis_colorbar=dict(
             title=dict(
                 text='<b>Number of<br>Executions</b>',
@@ -240,13 +238,13 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     filtered_df_grouped = filtered_df.groupby(['Sex', 'Race']).size().reset_index(name='Executions')
 
-    fig2 = px.sunburst(data_frame=filtered_df_grouped,
+    nested_pie_chart = px.sunburst(data_frame=filtered_df_grouped,
                        path=['Sex', 'Race'],
                        values='Executions',
                        color='Race',
                        title='Number of executions by sex and race'
                        )
-    fig2.update_layout(
+    nested_pie_chart.update_layout(
         title=dict(text="<b>Number of executions by sex and race</b>", font=dict(color='white'), x=0.5, y=0.95),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)'
@@ -270,7 +268,7 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
         plot_bgcolor='rgba(0,0,0,0)'
     )
 
-    ### VISUALIZATION 4 - MATRIX
+    ### VISUALIZATION 4 - MATRIX (HEATMAP)
 
     victims_by_race = filtered_df.groupby('Race').size().reset_index(name='Executions')
     victims_by_race = victims_by_race[victims_by_race['Executions'] > 0]    # filter out races with 0 executions
@@ -282,13 +280,14 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     victims_data = filtered_df.groupby('Race')[victims_columns].sum().reset_index(drop=True)
 
-    fig4 = px.imshow(victims_data,
+    matrix = px.imshow(victims_data,
                      labels=dict(x="Victim's Race", y="Race of the Executed", title="Executioners' Race vs Victims' Race"),
                      x=race_victims,
                      y=victims_by_race['Race'],
-                     color_continuous_scale='reds')
+                       text_auto=True,
+                     color_continuous_scale= px.colors.sequential.Pinkyl)
 
-    fig4.update_layout(
+    matrix.update_layout(
         xaxis=dict(title=dict(text="<b>Victim's Race</b>", font=dict(color='white')),
                    tickfont=dict(color='white')),
         yaxis=dict(title=dict(text='<b>Race of the Executed</b>', font=dict(color='white')),
@@ -300,13 +299,16 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
         title=dict(text="<b>Executioners' Race vs Victims' Race</b>", font=dict(color='white'), x=0.5, y=0.95)
     )
 
+    ### VISUALIZATION 5 - SCATTER PLOT
+
+
     # Create a new column for the total number of victims per execution
     filtered_df['Total Victims'] = filtered_df['Number of White Victims'] + filtered_df['Number of Black Victims'] + filtered_df[
         'Number of Latino Victims'] + filtered_df['Number of Asian Victims'] + filtered_df['Number of Native American Victims'] + filtered_df[
                               'Number of Other Race Victims']
 
     # Create a scatter plot with the total number of victims determining the size of the scatter points
-    scatter_fig = px.scatter(filtered_df, x="Execution Date", y="Region", size='Total Victims', title="Execution Date vs Region")
+    scatter_fig = px.scatter(filtered_df, x="Execution Year", y="Region", size='Total Victims', title="Execution Date vs Region")
 
     # Set the axis and hover labels
     scatter_fig.update_layout(
@@ -324,22 +326,28 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     filtered_df['ID'] = filtered_df.index
     pivot_df = pd.pivot_table(filtered_df, values='ID', index=['Race'], columns=['Region'], aggfunc='count').sort_values("South", ascending=False)
-    figH = px.bar(pivot_df, x=pivot_df.index, y=["South", "West", "Midwest", "Northeast"], title='Number of Executed by Race and Region' )
 
-    figH.update_layout(
+    stackedBar = px.bar(pivot_df, x=pivot_df.index, y=["South", "West", "Midwest", "Northeast"], title='Number of Executed by Race and Region')
+
+    ### VISUALIZATION 6 - STACKED BAR CHART
+
+   ## stackedBar = px.bar(pivot_df, x=pivot_df.index, y=["South", "West", "Midwest", "Northeast"], title='Number of Executed by Race and Region')
+
+    stackedBar.update_layout(
         title=dict(text="<b>Number of Executed by Race and Region</b>", font=dict(color='white'), x=0.5, y=0.95),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         xaxis=dict(title=dict(text="<b>Race</b>", font=dict(color='white')),
                    tickfont=dict(color='white')),
         yaxis=dict(title=dict(text="<b>Number of Executed</b>", font=dict(color='white')),
-                   tickfont=dict(color='white')),
+                   tickfont=dict(color='white'),
+                   type='log'),
         legend=dict(
             title=dict(text="<b>Region</b>", font=dict(color='white')),
             font=dict(color='white')
         )
     )
-    return map_title, fig1, fig2, linechart, fig4, scatter_fig, figH
+    return map_title, choropleth_map, nested_pie_chart, linechart, matrix, scatter_fig, stackedBar
 
 ################################### END OF THE APP ###################################
 
