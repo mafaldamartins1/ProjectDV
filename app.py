@@ -17,7 +17,19 @@ colors = {
     'secondary': '#00BFFF'
 }
 
-emoji = "🇺🇸👩🏻‍⚖️"
+footer_style = {
+    'position': 'flex',
+    'bottom': '0',
+    'left': '0',
+    'width': '100%',
+    'background-color': '#1E1E1E',
+    'padding': '10px',
+    'font-size': '16px',
+    'text-align': 'center',
+    'font-family': 'Arial'
+}
+
+emoji = "🇺🇸"
 # Slider for the year choice
 range_slider = dcc.RangeSlider(
     id = 'range_slider',
@@ -88,7 +100,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
                     'margin-top': '20px',
                     'text-align': 'center',
                     'width': '100%',
-                    'margin-right':'80px',
+                    'margin-right':'60px',
                 }
             )
         ],
@@ -97,7 +109,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
         style={'display': 'flex', 'font-family':'HeadingNow', 'fontweight': 'light'}),
     html.Br(),
     html.Div([
-        html.H6(['For as long as we can remember, the USA has been remembered for punishment capital.',html.Br(),'Although some states are not covered, we seek in this visualization to investigate some of the causes and linearities in these events.'])],
+        html.H6(['For as long as we can remember, the USA has been remembered for punishment capital. Some volunteered, others not and',html.Br(),'although some states are not covered, we seek in this visualization to investigate some of the causes and linearities in these events.'])],
     style={'width': '100%', 'text-align': 'center', 'font-family':'SFPRODISPLAYREGULAR.OTF', 'fontweight': 'light', 'fontStyle': 'italic'}),
     html.Br(),
     html.Div([
@@ -156,29 +168,22 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
     html.Br(),
     html.Br(),
     html.Br(),
-    html.Footer(
-        children=[
-            html.Img(
-                src='/assets/logo.png',
-                style={
-                    'height': '70px',
-                    'margin-right': '60px',
-                    'vertical-align': 'middle',
-                    'float': 'right'
-                }
-            ),
-            html.Div([
-                html.H6('Dashboard produced by:'),
-                html.H6('Afonso Reyna, r20191'),
-                html.H6('André Silva, r20191226'),
-                html.H6('Gonçalo Rodrigues, r20191'),
-                html.H6('Mafalda Martins, r20191 ')],
-                style={'width': '30%', 'text-align': 'center', 'display': 'inline-block'}),
-                html.Br(),
-                html.Br()
-                ],style={'backgroundColor': '#1E1E1E'},
-
-    )
+        html.Footer(
+             children=[
+                html.Img(
+                    src='/assets/logo.png',
+                    style={
+                        'height': '70px',
+                        'margin-right': '60px',
+                        'vertical-align': 'middle',
+                        'float': 'right'
+                },
+             ),
+            html.Strong('Dashboard produced by:', style={'font-size':'20px'}),
+            html.Br(),
+            html.P('Afonso Reyna (r20191197) | André Silva (r20191226) | Gonçalo Rodrigues (r20191300) | Mafalda Martins(r20191220)'),
+            html.Br()
+    ], style=footer_style)
 ])
 
 sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
@@ -233,7 +238,7 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
                         scope="usa",
                         height=600,
                         color='Executions',
-                        color_continuous_scale= px.colors.sequential.Pinkyl,
+                        color_continuous_scale= px.colors.diverging.Geyser,
                         range_color=(0, executions_by_state['Executions'].max()),
                         labels={'Executions': 'Number of Executions'},
                         hover_data={'State':True, 'Executions':True}
@@ -257,15 +262,18 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
     ### VISUALIZATION 2- NESTED PIE CHART
 
     filtered_df_grouped = filtered_df.groupby(['Sex', 'Race']).size().reset_index(name='Executions')
+    geyser_colors = px.colors.diverging.Geyser
+    colors1 = [geyser_colors[0], geyser_colors[2], geyser_colors[4], geyser_colors[6]]
 
     nested_pie_chart = px.sunburst(data_frame=filtered_df_grouped,
                        path=['Sex', 'Race'],
                        values='Executions',
                        color='Race',
+                       color_discrete_sequence=colors1,
                        title='Number of executions by sex and race'
                        )
     nested_pie_chart.update_layout(
-        title=dict(text="<b>Number of executions by sex and race</b>", font=dict(color='white',
+        title=dict(text="<b>Total no. of executions by sex and race</b>", font=dict(color='white',
         size=18), x=0.5, y=0.95),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)'
@@ -275,10 +283,10 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     executions_by_race_by_year = filtered_df.groupby(['Race', 'Execution Year']).size().reset_index(name='Executions')
 
-    linechart = px.line(executions_by_race_by_year, title="Executions per Race over time", x="Execution Year", y='Executions', color='Race', height=400)
+    linechart = px.line(executions_by_race_by_year, title="Executions per race over time", x="Execution Year", y='Executions', color='Race', height=400)
 
     linechart.update_layout(
-        title=dict(text="<b>Executions per Race over time</b>", font=dict(color='white'), x=0.5, y=0.95),
+        title=dict(text="<b>Executions per race over time</b>", font=dict(color='white'), x=0.5, y=0.95),
         xaxis=dict(title=dict(text='<b>Execution Year</b>', font=dict(color='white')),
                    tickfont=dict(color='white')),
         yaxis=dict(title=dict(text='<b>Executions</b>', font=dict(color='white')),
@@ -302,11 +310,11 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
     victims_data = filtered_df.groupby('Race')[victims_columns].sum().reset_index(drop=True)
 
     matrix = px.imshow(victims_data,
-                     labels=dict(x="Victim's Race", y="Race of the Executed", title="Executioners' Race vs Victims' Race"),
+                     labels=dict(x="Victim's Race", y="Race of the Executed", title="Executioners' race vs. victims' race"),
                      x=race_victims,
                      y=victims_by_race['Race'],
                        text_auto=True,
-                     color_continuous_scale= px.colors.sequential.Pinkyl)
+                     color_continuous_scale= px.colors.diverging.Geyser)
 
     matrix.update_layout(
         xaxis=dict(title=dict(text="<b>Victim's Race</b>", font=dict(color='white')),
@@ -317,14 +325,14 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
                                      tickfont=dict(color='white'))),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        title=dict(text="<b>Executioners' Race vs Victims' Race</b>", font=dict(color='white'), x=0.5, y=0.95)
+        title=dict(text="<b>Executioners' race vs victims' race</b>", font=dict(color='white'), x=0.5, y=0.95)
     )
 
     ### VISUALIZATION 5 - SCATTER PLOT
 
     executions_by_year = filtered_df.groupby(['Execution Year', 'Region']).agg({'Region': 'count'}).rename(
         columns={'Region': 'No_executions'}).reset_index()
-    scatter_fig = px.scatter(executions_by_year, x="Execution Year", y="Region", size='No_executions', title="Execution Date vs Region")
+    scatter_fig = px.scatter(executions_by_year, x="Execution Year", y="Region", size='No_executions', title="Execution Date vs Region", color_discrete_sequence=['#028180'])
 
     # Set the axis and hover labels
     scatter_fig.update_layout(
@@ -337,15 +345,40 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
                    tickfont=dict(color='white')),
         yaxis=dict(title=dict(text="<b>Region</b>", font=dict(color='white')),
                    tickfont=dict(color='white')),
-        title=dict(text="<b>Execution Date vs Region</b>", font=dict(color='white'),x=0.5, y=0.95)
+        title=dict(text="<b>Execution date vs region</b>", font=dict(color='white'),x=0.5, y=0.95)
     )
 
     filtered_df['ID'] = filtered_df.index
     pivot_df = pd.pivot_table(filtered_df, values='ID', index=['Race'], columns=['Region'], aggfunc='count',
                               dropna=False).sort_values("South", ascending=False)
     #  pivot_df = pd.pivot_table(filtered_df, values='ID', index=['Race'], columns=['Region'], aggfunc='count').sort_values("South", ascending=False)
-
-    stackedBar = px.bar(pivot_df, x=pivot_df.index, title='Number of Executed by Race and Region')
+    geyser_colors = px.colors.diverging.Geyser
+    stackedBar = px.bar(pivot_df, x=pivot_df.index, title='Total no. of executions by race and region')
+    for i, col in enumerate(pivot_df.columns):
+        stackedBar.add_trace(
+            go.Bar(x=pivot_df.index, y=pivot_df[col], name=col, marker=dict(color=geyser_colors[i]))
+        )
+    stackedBar.update_layout(
+        barmode='stack',
+        yaxis=dict(title='Number of Executions'),
+        xaxis=dict(title='Race')
+    )
+    stackedBar.update_layout(
+        title=dict(text="<b>Total no. of executions by race and region</b>", font=dict(color='white'), x=0.5, y=0.95),
+        paper_bgcolor='rgba(0,0,0,0)',
+        plot_bgcolor='rgba(0,0,0,0)',
+        xaxis=dict(title=dict(text="<b>Race</b>", font=dict(color='white')),
+                   tickfont=dict(color='white')),
+        yaxis=dict(title=dict(text="<b>Number of Executed in log scale</b>", font=dict(color='white')),
+                   tickfont=dict(color='white')
+                    ,type='log'
+                   ),
+        legend=dict(
+            title=dict(text="<b>Region</b>", font=dict(color='white')),
+            font=dict(color='white')
+        )
+    )
+    return map_title, choropleth_map, nested_pie_chart, linechart, matrix, scatter_fig, stackedBar
     for col in pivot_df.columns:
         stackedBar.add_trace(
             go.Bar(x=pivot_df.index, y=pivot_df[col], name=col)
