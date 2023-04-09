@@ -16,6 +16,8 @@ colors = {
     'primary': '#FFA500',
     'secondary': '#00BFFF'
 }
+
+emoji = "🇺🇸👩🏻‍⚖️"
 # Slider for the year choice
 range_slider = dcc.RangeSlider(
     id = 'range_slider',
@@ -88,23 +90,24 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
                 }
             ),
         html.H1(
-                'Executions in USA',
+                'Executions in USA ' + emoji,
                 style={
                     'display': 'inline-block',
                     'vertical-align': 'top',
                     'margin-top': '20px',
                     'text-align': 'center',
-                    'width': '100%'
+                    'width': '100%',
+                    'margin-right':'80px',
                 }
             )
         ],
         id='Title row',
         className='title_box',
-        style={'display': 'flex'}),
+        style={'display': 'flex', 'font-family':'HeadingNow', 'fontweight': 'light'}),
     html.Br(),
     html.Div([
-        html.H6('TEXTO INTRODUTORIO BLABLABLA INTRODUÇAO DO REPORT AHAHAHHAH')],
-    style={'width': '100%', 'text-align': 'center'}),
+        html.H6(['For as long as we can remember, the USA has been remembered for punishment capital.',html.Br(),'Although some states are not covered, we seek in this visualization to investigate some of the causes and linearities in these events.'])],
+    style={'width': '100%', 'text-align': 'center', 'font-family':'SFPRODISPLAYREGULAR.OTF', 'fontweight': 'light', 'fontStyle': 'italic'}),
     html.Br(),
     html.Div([
         html.Div([
@@ -138,10 +141,10 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
         ], style={'width': '100%'}),
     ], style={'display': 'inline-block', 'width': '100%', 'text-align': 'center'}),
     html.Div([
-        html.Div([        html.H2('Between 1977 and 2023, 1561 prisioners were executed in the USA')    ], style={'width': '30%', 'text-align': 'center'}),
+        html.Div([        html.H2(['Between 1977 and 2023, ',html.Strong('1561'),' prisioners were executed in the USA.'])    ], style={'width': '30%', 'text-align': 'center', 'font-family':'Montserrat-VariableFont_wght', 'fontstyle': 'light'}),
         html.Div([
             dcc.Graph(id='nested_pie_chart')    ], style={'width': '30%'}),
-        html.Div([        html.H2('55.6% of the executed were white and 98.5% of them were male')    ], style={'width': '30%', 'text-align': 'center'}),
+        html.Div([        html.H2([ html.Strong('55.6%'),'of the executed were white and ',html.Strong('98.5%') ,'of them were male.'])    ], style={'width': '30%', 'text-align': 'center', 'font-family':'Montserrat-VariableFont_wght', 'fontstyle': 'light'}),
     ], style={'display': 'flex', 'align-items': 'center', 'justify-content': 'center', 'width': '100%'}),
     html.Div([
         html.Div([
@@ -245,7 +248,8 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
                        title='Number of executions by sex and race'
                        )
     nested_pie_chart.update_layout(
-        title=dict(text="<b>Number of executions by sex and race</b>", font=dict(color='white'), x=0.5, y=0.95),
+        title=dict(text="<b>Number of executions by sex and race</b>", font=dict(color='white',
+        size=18), x=0.5, y=0.95),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)'
     )
