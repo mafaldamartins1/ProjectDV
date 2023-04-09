@@ -93,7 +93,7 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
                       children=[
     html.Div([
         html.H1(
-                'Executions in USA ' + emoji,
+                'Executions in USA',
                 style={
                     'display': 'inline-block',
                     'vertical-align': 'top',
@@ -263,21 +263,23 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     filtered_df_grouped = filtered_df.groupby(['Sex', 'Race']).size().reset_index(name='Executions')
     geyser_colors = px.colors.diverging.Geyser
-    colors1 = [geyser_colors[0], geyser_colors[2], geyser_colors[4], geyser_colors[6]]
-
+    temps_colors = px.colors.diverging.Temps
+    colors1 = [geyser_colors[0], geyser_colors[2], geyser_colors[4], geyser_colors[6], geyser_colors[1], geyser_colors[5], temps_colors[1], temps_colors[3], temps_colors[5]]
+    colors2 = [geyser_colors[0], geyser_colors[1]]
     nested_pie_chart = px.sunburst(data_frame=filtered_df_grouped,
-                       path=['Sex', 'Race'],
-                       values='Executions',
-                       color='Race',
-                       color_discrete_sequence=colors1,
-                       title='Number of executions by sex and race'
-                       )
+                               path=['Sex', 'Race'],
+                               values='Executions',
+                               color='Race',
+                               color_discrete_sequence=colors1,
+                               branchvalues='total',
+                               title='Number of executions by sex and race'
+                               )
+    nested_pie_chart.update_traces(marker=dict(colors=colors1))
     nested_pie_chart.update_layout(
-        title=dict(text="<b>Total no. of executions by sex and race</b>", font=dict(color='white',
-        size=18), x=0.5, y=0.95),
-        paper_bgcolor='rgba(0,0,0,0)',
-        plot_bgcolor='rgba(0,0,0,0)'
-    )
+    title=dict(text="<b>Total no. of executions by sex and race</b>", font=dict(color='white', size=18), x=0.5, y=0.95),
+    paper_bgcolor='rgba(0,0,0,0)',
+    plot_bgcolor='rgba(0,0,0,0)'
+)
 
     ### VISUALIZATION 3 - LINE CHART
 
