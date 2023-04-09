@@ -338,12 +338,12 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     # Set the axis and hover labels
     scatter_fig.update_layout(
-        xaxis_title="Execution Date",
+        xaxis_title="Execution Year",
         yaxis_title="Region",
         hovermode="closest",
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
-        xaxis=dict(title=dict(text="<b>Execution Date</b>", font=dict(color='white')),
+        xaxis=dict(title=dict(text="<b>Execution Year</b>", font=dict(color='white')),
                    tickfont=dict(color='white')),
         yaxis=dict(title=dict(text="<b>Region</b>", font=dict(color='white')),
                    tickfont=dict(color='white')),
