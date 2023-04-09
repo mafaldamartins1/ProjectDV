@@ -41,8 +41,6 @@ df['Number of Asian Victims'] = df['Number of Asian Male Victims'] + df['Number 
 df['Number of Native American Victims'] = df['Number of Native American Male Victims'] + df['Number of American Indian or Alaska Native Female Victims']
 df['Number of Other Race Victims'] = df['Number of Other Race Male Victims'] + df['Number of Other Race Female Victims']
 
-# drop das outras?
-
 state_codes = {
     'Alabama': 'AL',
     'Alaska': 'AK',
@@ -100,16 +98,14 @@ df['Race'] = df['Race'].replace('American Indian or Alaska Native','Native Ameri
 # Create a new column in your dataframe that maps state names to state codes
 df['State Code'] = df['State'].map(state_codes)
 
-print(df.columns)
-
-print(df['Victim(s) Race(s)'].unique())
-
 # Drop columns that won't be used
-# 'Last Name', 'Middle Name(s)', 'Suffix', 'Number of White Male Victims', 'Number of Black Male Victims',
-#        'Number of Latino Male Victims', 'Number of Asian Male Victims',
-#        'Number of Native American Male Victims',
-#        'Number of Other Race Male Victims', 'Number of White Female Victims',
-#        'Number of Black Female Victims', 'Number of Latino Female Victims',
-#        'Number of Asian Female Victims',
-#        'Number of American Indian or Alaska Native Female Victims',
-#        'Number of Other Race Female Victims', 'Victim(s) Race(s)'
+df = df.drop(['Last Name', 'Middle Name(s)', 'Juvenile', 'First Name', 'Suffix', 'Number of White Male Victims', 'Number of Black Male Victims',
+        'Number of Latino Male Victims', 'Number of Asian Male Victims',
+        'Number of Native American Male Victims',
+        'Number of Other Race Male Victims', 'Number of White Female Victims',
+        'Number of Black Female Victims', 'Number of Latino Female Victims',
+        'Number of Asian Female Victims',
+        'Number of American Indian or Alaska Native Female Victims',
+        'Number of Other Race Female Victims', 'Victim(s) Race(s)'], axis=1)
+
+print(df.columns)
