@@ -78,15 +78,6 @@ server = app.server
 app.layout = html.Div(style={'backgroundColor': colors['background']},
                       children=[
     html.Div([
-            html.Img(
-                src='/assets/logo.png',
-                style={
-                    'height': '70px',
-                    'display': 'inline-block',
-                    'margin-right': '15px',
-                    'vertical-align': 'top'
-                }
-            ),
         html.H1(
                 'Executions in USA',
                 style={
@@ -159,6 +150,32 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
             dcc.Graph(id='scatter_fig')
         ], style={'display': 'inline-block', 'width': '48%'}),
     ], style={'display': 'inline-block', 'width': '100%', 'text-align': 'center'}),
+    html.Br(),
+    html.Br(),
+    html.Br(),
+    html.Footer(
+        children=[
+            html.Img(
+                src='/assets/logo.png',
+                style={
+                    'height': '70px',
+                    'margin-right': '60px',
+                    'vertical-align': 'middle',
+                    'float': 'right'
+                }
+            ),
+            html.Div([
+                html.H6('Dashboard produced by:'),
+                html.H6('Afonso Reyna, r20191'),
+                html.H6('André Silva, r20191226'),
+                html.H6('Gonçalo Rodrigues, r20191'),
+                html.H6('Mafalda Martins, r20191 ')],
+                style={'width': '30%', 'text-align': 'center', 'display': 'inline-block'}),
+                html.Br(),
+                html.Br()
+                ],style={'backgroundColor': '#1E1E1E'},
+
+    )
 ])
 
 sex_dropdown.style = {'margin-top': '20px', 'margin-left': '-15px'}
@@ -301,14 +318,9 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     ### VISUALIZATION 5 - SCATTER PLOT
 
-
-    # Create a new column for the total number of victims per execution
-    filtered_df['Total Victims'] = filtered_df['Number of White Victims'] + filtered_df['Number of Black Victims'] + filtered_df[
-        'Number of Latino Victims'] + filtered_df['Number of Asian Victims'] + filtered_df['Number of Native American Victims'] + filtered_df[
-                              'Number of Other Race Victims']
-
-    # Create a scatter plot with the total number of victims determining the size of the scatter points
-    scatter_fig = px.scatter(filtered_df, x="Execution Year", y="Region", size='Total Victims', title="Execution Date vs Region")
+    executions_by_year = filtered_df.groupby(['Execution Year', 'Region']).agg({'Region': 'count'}).rename(
+        columns={'Region': 'No_executions'}).reset_index()
+    scatter_fig = px.scatter(executions_by_year, x="Execution Year", y="Region", size='No_executions', title="Execution Date vs Region")
 
     # Set the axis and hover labels
     scatter_fig.update_layout(
@@ -325,23 +337,30 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
     )
 
     filtered_df['ID'] = filtered_df.index
-    pivot_df = pd.pivot_table(filtered_df, values='ID', index=['Race'], columns=['Region'], aggfunc='count').sort_values("South", ascending=False)
+    pivot_df = pd.pivot_table(filtered_df, values='ID', index=['Race'], columns=['Region'], aggfunc='count',
+                              dropna=False).sort_values("South", ascending=False)
+    #  pivot_df = pd.pivot_table(filtered_df, values='ID', index=['Race'], columns=['Region'], aggfunc='count').sort_values("South", ascending=False)
 
-    stackedBar = px.bar(pivot_df, x=pivot_df.index, y=["South", "West", "Midwest", "Northeast"], title='Number of Executed by Race and Region')
-
-    ### VISUALIZATION 6 - STACKED BAR CHART
-
-   ## stackedBar = px.bar(pivot_df, x=pivot_df.index, y=["South", "West", "Midwest", "Northeast"], title='Number of Executed by Race and Region')
-
+    stackedBar = px.bar(pivot_df, x=pivot_df.index, title='Number of Executed by Race and Region')
+    for col in pivot_df.columns:
+        stackedBar.add_trace(
+            go.Bar(x=pivot_df.index, y=pivot_df[col], name=col)
+        )
+    stackedBar.update_layout(
+        barmode='stack',
+        yaxis=dict(title='Number of Executions'),
+        xaxis=dict(title='Race')
+    )
     stackedBar.update_layout(
         title=dict(text="<b>Number of Executed by Race and Region</b>", font=dict(color='white'), x=0.5, y=0.95),
         paper_bgcolor='rgba(0,0,0,0)',
         plot_bgcolor='rgba(0,0,0,0)',
         xaxis=dict(title=dict(text="<b>Race</b>", font=dict(color='white')),
                    tickfont=dict(color='white')),
-        yaxis=dict(title=dict(text="<b>Number of Executed</b>", font=dict(color='white')),
-                   tickfont=dict(color='white'),
-                   type='log'),
+        yaxis=dict(title=dict(text="<b>Number of Executed in log scale</b>", font=dict(color='white')),
+                   tickfont=dict(color='white')
+                    ,type='linear'
+                   ),
         legend=dict(
             title=dict(text="<b>Region</b>", font=dict(color='white')),
             font=dict(color='white')
