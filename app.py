@@ -334,7 +334,7 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
 
     executions_by_year = filtered_df.groupby(['Execution Year', 'Region']).agg({'Region': 'count'}).rename(
         columns={'Region': 'No_executions'}).reset_index()
-    scatter_fig = px.scatter(executions_by_year, x="Execution Year", y="Region", size='No_executions', title="Execution Date vs Region", color_discrete_sequence=['#028180'])
+    scatter_fig = px.scatter(executions_by_year, x="Execution Year", y="Region", size='No_executions', title="Execution Year vs Region", color_discrete_sequence=['#028180'])
 
     # Set the axis and hover labels
     scatter_fig.update_layout(
@@ -347,7 +347,7 @@ def plot(range_slider, sex_dropdown, race_dropdown, volunteer_checkbox, foreign_
                    tickfont=dict(color='white')),
         yaxis=dict(title=dict(text="<b>Region</b>", font=dict(color='white')),
                    tickfont=dict(color='white')),
-        title=dict(text="<b>Execution date vs region</b>", font=dict(color='white'),x=0.5, y=0.95)
+        title=dict(text="<b>Execution year vs region</b>", font=dict(color='white'),x=0.5, y=0.95)
     )
 
     filtered_df['ID'] = filtered_df.index
