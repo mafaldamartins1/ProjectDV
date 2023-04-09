@@ -103,8 +103,8 @@ app.layout = html.Div(style={'backgroundColor': colors['background']},
         style={'display': 'flex'}),
     html.Br(),
     html.Div([
-        html.H6('TEXTO INTRODUTORIO BLABLABLA INTRODUÇAO DO REPORT AHAHAHHAH')],
-    style={'width': '100%', 'text-align': 'center'}),
+        html.H6(['The United Sates is still one of the places where the death penalty is applied,',html.Br(),'and with this project we wanted to explore a little more about this subject.',html.Br(),'Lets explore!'])],
+    style={'width': '100%', 'text-align': 'center', 'color':'white'}),
     html.Br(),
     html.Div([
         html.Div([
